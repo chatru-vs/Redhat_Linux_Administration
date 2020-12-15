@@ -1,5 +1,5 @@
 Additional Information and Resources
-To connect with VNC, install a VNC client like RealVNC Viewer.
+To connect with VNC, install a VNC client like RealVNC Viewer. Use port 5901 to connect with Server GUI
 
 RealVNC Viewer can be found at: https://www.realvnc.com/en/connect/download/viewer/
 
