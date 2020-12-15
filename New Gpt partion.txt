@@ -1,0 +1,76 @@
+[cloud_user@ip-10-0-0-113 ~]$ df
+Filesystem     1K-blocks    Used Available Use% Mounted on
+devtmpfs          482468       0    482468   0% /dev
+tmpfs             492988       0    492988   0% /dev/shm
+tmpfs             492988    6600    486388   2% /run
+tmpfs             492988       0    492988   0% /sys/fs/cgroup
+/dev/nvme0n1p1   8377344 2149268   6228076  26% /
+tmpfs              98600       0     98600   0% /run/user/0
+tmpfs              98600       0     98600   0% /run/user/1000
+[cloud_user@ip-10-0-0-113 ~]$ gdisk
+GPT fdisk (gdisk) version 0.8.10
+
+Type device filename, or press <Enter> to exit: /dev/nvme0n1p1
+Problem opening /dev/nvme0n1p1 for reading! Error is 13.
+You must run this program as root or use sudo!
+[cloud_user@ip-10-0-0-113 ~]$ sudo gdisk
+[sudo] password for cloud_user:
+[cloud_user@ip-10-0-0-113 ~]$ sudo -i
+[sudo] password for cloud_user:
+[root@ip-10-0-0-113 ~]# gdisk
+GPT fdisk (gdisk) version 0.8.10
+
+Type device filename, or press <Enter> to exit: /dev/nvme0n1p1
+Partition table scan:
+  MBR: not present
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+Creating new GPT entries.
+
+Command (? for help): n
+Partition number (1-128, default 1):
+First sector (34-16775134, default = 2048) or {+-}size{KMGTP}:
+Last sector (2048-16775134, default = 16775134) or {+-}size{KMGTP}: +2G
+Current type is 'Linux filesystem'
+Hex code or GUID (L to show codes, Enter = 8300):
+Changed type of partition to 'Linux filesystem'
+
+Command (? for help): w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? (Y/N): y
+OK; writing new GUID partition table (GPT) to /dev/nvme0n1p1.
+Warning: The kernel is still using the old partition table.
+The new table will be used at the next reboot.
+The operation has completed successfully.
+
+[root@ip-10-0-0-113 ~]# fdisk /dev/nvme0n1p1
+WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): n
+Partition number (2-128, default 2):
+First sector (34-16775134, default 4196352):
+Last sector, +sectors or +size{K,M,G,T,P} (4196352-16775134, default 16775134): +2G
+Created partition 2
+
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+
+WARNING: Re-reading the partition table failed with error 22: Invalid argument.
+The kernel still uses the old table. The new table will be used at
+the next reboot or after you run partprobe(8) or kpartx(8)
+Syncing disks.
+
+

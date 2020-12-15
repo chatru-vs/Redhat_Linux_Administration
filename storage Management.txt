@@ -1,0 +1,119 @@
+Additional Information and Resources
+
+There are two disks advertised to this server. You've been tasked with setting one up with a GPT partition table and allocating 2GB to a single partition. The other needs to be a MBR partition with a 2GB partition.
+
+Note: The Block devices have changed for the lab environment. To see the available block devices to use, run: lsblk The commands in the lab instructions have been updated for the new change.
+
+
+Learning Objectives
+check_circle
+Create a 2 GB GPT Partition
+
+    Create the partition:
+
+    gdisk /dev/nvme1n1
+
+    Enter n to create a new partition.
+
+    Accept the default for the partition number.
+
+    Accept the default for the starting sector.
+
+    For the ending sector, enter +2G to create a 2 GB partition.
+
+    Accept the default partition type.
+
+    Enter w to write the partition information.
+
+    Enter y to proceed.
+
+    Finalize the settings:
+
+    partprobe
+
+check_circle
+Create a 2 GB MBR Partition
+
+    Create the partition:
+
+    fdisk /dev/nvme2n1
+
+        Enter n to create a new partition.
+
+        Accept the default partition type.
+
+        Accept the default for the partition number.
+
+        Accept the default for the starting sector.
+
+        For the ending sector, type +2G to create a 2 GB partition.
+
+        Enter w to write the partition information.
+
+        Finalize the settings:
+
+    partprobe
+
+check_circle
+Format the GPT Partition with XFS and Mount the Device persistently
+
+    Format the partition:
+
+    mkfs.xfs /dev/nvme1n1p1
+
+Getting It Ready for Mounting
+
+    Run the following:
+
+    blkid
+
+    Copy the UUID of the partition at /dev/nvme1n1p1.
+
+    Open the /etc/fstab file:
+
+    vim /etc/fstab
+
+    Add the following, replacing <UUID> with the UUID you just copied:
+
+    UUID="<UUID>" /mnt/gptxfs xfs defaults 0 0
+
+    Save and exit the file by pressing Escape followed by :wq.
+
+Create a Mount Point
+
+    Create the mount point we specified in fstab:
+
+    mkdir /mnt/gptxfs
+
+    Mount everything that's described in fstab:
+
+    mount -a
+
+check_circle
+Format the MBR Partition with ext4 and Mount the Device.
+Format the MBR Partition with ext4 and Mount the Device on /mnt/mbrext4
+
+    Format the partition:
+
+    mkfs.ext4 /dev/nvme2n1p1
+
+Create a Mount Point
+
+    Create the mount point:
+
+    mkdir /mnt/mbrext4
+
+    Mount it:
+
+    mount /dev/nvme2n1p1 /mnt/mbrext4
+
+    Check that it's mounted:
+
+    mount
+
+    The partition should be listed in the output.
+
+    Mount the disk:
+
+    mount /dev/nvme2n1p1 /mnt/mbrext4
+

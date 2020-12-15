@@ -1,0 +1,77 @@
+# Successfully completed this activity
+
+Use the credentials and server IP to log in to our lab server. Run sudo -i to become root once you've logged in.
+
+We've been tasked with creating a large logical volume out of the two disks attached to this server. The Volume Group name should be RHCSA. The Logical Volume name should be pinehead and should be 3 GB in size.
+
+Make sure that the resulting logical volume is formatted as XFS and persistently mounted at /mnt/lvol.
+
+After that is complete, we should grow the logical volume and the filesystem by 200 MB.
+Learning Objectives
+check_circle
+Create Physical Devices
+
+    Get the names of our disks:
+
+    fdisk -l
+
+    Create the physical devices:
+
+    pvcreate /dev/xvdg /dev/xvdf
+
+check_circle
+Create a Volume Group
+
+Create a volume group on the physical devices we created in the previous task:
+
+vgcreate RHCSA /dev/xvdg /dev/xvdf
+
+check_circle
+Create a Logical Volume
+
+Create the Logical Volume:
+
+lvcreate -n pinehead -L 3G RHCSA
+
+    -n denotes the name of the LV.
+    -L denotes the size of the LV.
+    RHCSA is the name of the volume group we're creating this LV in.
+
+check_circle
+Format the LV as XFS and Mount It Persistently at `/mnt/lvol`
+
+    Format the disk as XFS:
+
+    mkfs.xfs /dev/mapper/RHCSA-pinehead
+
+    Create a mount point:
+
+    mkdir /mnt/lvol
+
+    Get the UUID:
+
+    blkid
+
+    Copy the UUID, and edit /etc/fstab.
+
+    Create a new line that looks like:
+
+    UUID="THE-UUID-YOU-COPIED" /mnt/lvol xfs defaults 0 0
+
+    Save and exit, and then run:
+
+    mount -a
+
+check_circle
+Grow the Mount Point by 200 MB
+
+    To grow the LV, run:
+
+    lvextend -L+200M /dev/RHCSA/pinehead
+
+    To have the LVM tools automatically resize the filesystem, you could pass the -r or --resizefs flags.
+
+    Another way to resize the filesystem is by running:
+
+    xfs_growfs /mnt/lvol
+

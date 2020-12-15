@@ -1,0 +1,162 @@
+Additional Information and Resources
+To connect with VNC, install a VNC client like RealVNC Viewer.
+
+RealVNC Viewer can be found at: https://www.realvnc.com/en/connect/download/viewer/
+
+After installing RealVNC Viewer or your preferred VNC client, connect by specifying the provided IP address, port number 5901, and credentials. The credentials and server IP in the hands-on lab overview page are not for the SSH protocol, they are for VNC, and the server is listening on port 5901. Just as it is in the real exam, SSH is disabled. To simulate sitting for the exam, we're going to VNC into a machine, then run most of the lab in a virtual machine that we create from there.
+
+Note: If you have trouble getting the rd.break step to work, try forcing a reset on the VM in Virtual Machine Manager.
+
+The repository/GPG key required for the exam is here:
+
+http://mirror.centos.org/centos/7/os/x86_64/
+
+The other half is on the filesystem of the VM, here:
+
+/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+Learning Objectives
+check_circle
+Start the Guest VM
+Get the VM's name from virsh list --all, and start it using virsh start <VMNAME>.
+
+check_circle
+Create Three Users (Derek, Tom, and Kenny) that All Belong to the `instructors` Group. Prevent Tom's User from Accessing a Shell, and Make His Account Expire Ten Days from Now.
+We need to create three users that must belong to the instructors group. Their names are Derek, Tom, and Kenny. We want to make sure that Tom can't get to a shell, and we want his account to expire ten days from now.
+
+You can create the users using the useradd command. Group and shell modifications are done with usermod, and you can set an expiration date using the chage command.
+
+check_circle
+Download and Configure Apache to Serve `index.html` from `/var/web` and Access It from the Host Machine
+Install Apache using yum install httpd. Then edit /etc/httpd/conf/httpd.conf to change the DocumentRoot as required.
+
+check_circle
+Configure Umask to Ensure All Files Created by Any User Cannot Be Accessed by "other" Users
+The default umask for all users is set in the /etc/profile and /etc/bashrc files.
+
+check_circle
+Find All Files in `/etc` (Not Subdirectories) that Are Older Than 720 Days, and Output a List to `/root/oldfiles`
+The find command has numerous flags that can help with this.
+
+-maxdepth 1 will search only /etc and not any subdirectories.
+
+-mtime +720 will match on files that were modified more than 720 days ago.
+
+A complete command is:
+
+find /etc/ -maxdepth 1 -mtime +720 > /root/oldfiles
+
+check_circle
+Find All Log Messages in `/var/log/messages` That Contain "ACPI", and Export Them to a File Called `/root/logs`. Then Archive All of `/var/log` and Save It to `/tmp/log_archive.tgz`
+To find matching lines in a file you should use grep.
+
+grep ACPI /var/log/messages > /root/logs
+
+Then you need to compress /var/log.
+
+tar -czf /tmp/log_archive.tgz /var/log/
+
+check_circle
+Modify the GRUB Timeout and Make It 1 Second Instead of 5
+Edit /etc/default/grub and change the timeout to 1.
+
+Then run grub2-mkconfig -o /boot/grub2/grub.cfg to rebuild the GRUB configuration and make the change take effect.
+
+check_circle
+Create a Daily Cron Job at 4:27pm for the `derek` User that Runs `cat /etc/redhat-release` and Redirects the Output to `/home/derek/release`
+To edit a user's crontab you can run:
+
+crontab -e -u derek
+
+And then the format of the line for this task would be this:
+
+27 16 * * * cat /etc/redhat-release > /home/derek/release
+
+check_circle
+Configure `time.nist.gov` as the Only NTP Server
+The NTP client in RHEL and CentOS is chrony. The configuration file for chrony is /etc/chrony.conf.
+
+Edit that file, remove the default lines that begin with server, and write a new one like this:
+
+server time.nist.gov
+
+check_circle
+Create an 800M Swap Partition on the `vdb` Disk and Use the UUID to Ensure That It Is Persistent
+First we need to create a new partition:
+
+Run fdisk /dev/vdb.
+
+Press n to create a new partition.
+Accept the default for the partition number.
+Accept the default for the starting sector.
+Use +800M for the ending sector.
+Press t to set the partition type (use 82 to set it to Linux Swap).
+Press w to write the changes.
+Run partprobe to make sure the kernel knows about the changes.
+
+Run mkswap /dev/vdbX, where X is the partition number.
+
+Run blkid to get the UUID of the partition.
+
+Add the following to /etc/fstab:
+
+UUID="LONG-UUID-STRING-COPIED-FROM-blkid" swap        swap    defaults        0 0
+
+Save and exit, then run swapon -a.
+
+Run free to verify that everything is correct.
+
+check_circle
+Create a New Logical Volume (LV-A) with a Size of 30 Extents that Belongs to the Volume Group VG-A (with a PE Size of 32M). After Creating the Volume, Configure the Server to Mount It Persistently on `/mnt`.
+First we need to create a physical volume. Let's assume your disk is /dev/vdc:
+
+pvcreate /dev/vdc
+
+Then we need to create the Volume Group named VG-A with a 32M physical extent size:
+
+vgcreate VG-A /dev/vdc -s 32m
+
+Finally, we create the Logical Volume named LV-A with 30 extents:
+
+lvcreate -n LV-A -l 30 VG-A
+
+Now we can format the volume:
+
+mkfs.xfs /dev/VG-A/LV-A
+
+And finally, we can edit /etc/fstab to add the following line:
+
+/dev/mapper/VG--A-LV--A     /mnt    xfs    defaults    0 0
+
+check_circle
+On the Host, Not the Guest VM, Utilize ldap.linuxacademy.com for SSO, and Configure AutoFS to Mount Users' Home Directories on Login. Make Sure to Use Kerberos.
+The server is ldap.linuxacademy.com. The Kerberos certificate is located at http://ldap.linuxacademy.com/pub/cert.pem.
+
+First, we need to install the required packages.
+
+yum install -y authconfig-gtk nss-pam-ldapd pam_krb5 autofs nfs-utils openldap-clients
+Now we can run authconfig-gtk.
+
+Set the Search Base DN to "dc=linuxacademy,dc=com".
+Set the LDAP Server to ldap.linuxacademy.com.
+Select Use TLS, and enter http://ldap.linuxacademy.com/pub/cert.pem to download the cert.
+Switch to the Advanced tab and select Create Home directories on the first login.
+Select Apply.
+Edit /etc/auto.master.d/ldap.autofs, and add the following line:
+
+/home/guests /etc/auto.ldap
+Edit /etc/auto.ldap, and add the following line:
+
+* -rw ldap.linuxacademy.com:/home/guests/&
+Edit /etc/pam.d/sshd, and add the following to the first section:
+
+auth   sufficient    pam_ldap.so
+Restart sshd with systemctl restart sshd.
+
+Now you should be able to verify by running su - ldapuser3.
+
+check_circle
+Change the Hostname of the Guest to "rhcsa"
+For this task you can use hostnamectl.
+
+hostnamectl set-hostname rhcsa

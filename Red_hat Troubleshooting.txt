@@ -1,0 +1,54 @@
+sudo -i
+df -h
+nproc
+systemctl enable pmcd && systemctl start pmcd
+du -h --max-depth=1 / => To know the size of folder in root directory
+du -h --max-depth=1 /home/cloud_user
+rm -rf /home/cloud_user/xxx.txt => delete the data
+pcp atop - show the activity since last booting of OS
+hit "a" to see the active stuff running
+kill -9 1476 - kill the high utilization process
+uptime
+###############################################################################
+yum install -y pcp && pcp-system-tools
+systemctl enable pmcd pmlogger && systemctl start pmcl pmlogger
+pmrep kernel.all.load
+pmval kernel.all.load 
+pmval disk.partitions.total_rawactive
+pmval -T 10s disk.partitions.total_rawactive > /disk.txt
+pcp | grep logger
+pmrep -t 1m -a /disk.txt kernel.all.load
+##################################################
+@@ means tcp
+@ means udp
+vim etc/rsyslog.conf
+systemctl restart rsyslogss -lntp
+firewall-cmd --permanent -add-port=514/tcp && firewall-cmd --reload
+yum install yum-plugin-security`
+
+yum update info
+
+yum updateinfo list
+
+yum updateinfo list --sec-severity=SAVS
+
+yum updateinfo list --sec-severity=Critical
+
+yum updateinfo list --sec-severity=Moderate
+
+##############################
+systemctl start pmcd
+systemctl status pmcd
+systemctl start pmlogger
+systemctl status pmlogger
+systemctl enable pmlogger 
+ausearch -m avc -ts recent - show recent logs
+ls -Z /home/cloud_user/html/index.html
+
+
+
+
+
+
+
+

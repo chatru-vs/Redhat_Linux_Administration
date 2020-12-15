@@ -1,0 +1,15 @@
+hard link:
+
+ln test test2 - point to the data of the file. inode are same. hard link are on inode level not in file level
+
+ls -li
+
+===================================================================
+
+Soft Link
+
+ln -s test test2 - inode are different. test2 redirect to test. it points to file name include entire path
+
+ls - li 
+
+connect vnc with 5901 port

@@ -1,0 +1,1135 @@
+Additional Information and Resources
+
+You've been asked to configure a system to provide live and historical metrics of its CPU load, disk I/O, and network traffic.
+Learning Objectives
+check_circle
+Install Performance Co-Pilot.
+
+Install pcp and pcp-system-tools.
+
+Enable and start the pmcd and pmlogger services.
+check_circle
+Take a baseline of CPU load.
+
+Take a baseline of the kernel.all.load metric for 10 seconds and put this into the file /home/cloud_user/kernel.all.load.txt.
+
+You can do this using the pmval or pmrep command:
+
+pmval -T 10s kernel.all.load > /home/cloud_user/kernel.all.load.txt
+
+Or:
+
+pmrep -T 10s kernel.all.load > /home/cloud_user/kernel.all.load.txt
+
+check_circle
+Take a baseline of disk I/O.
+
+Take a baseline of the disk.partitions.total_rawactive metric for 10 seconds and put this into the file /home/cloud_user/disk.partitions.total_rawactive.txt.
+
+You can do this using the pmval or pmrep command:
+
+pmval -T 10s disk.partitions.total_rawactive > /home/cloud_user/disk.partitions.total_rawactive.txt
+
+Or:
+
+pmrep -T 10s disk.partitions.total_rawactive > /home/cloud_user/disk.partitions.total_rawactive.txt
+
+check_circle
+Generate some disk I/O and CPU load.
+
+By now, pmlogger has been running for a few minutes. Generate some load so that we can look at it in the archive.
+
+Before and after each of the commands that generate load, make a note of the system time. You can do so using the command:
+
+date
+
+Generate some CPU load
+
+Run the following command to generate some CPU load for 1 minute:
+
+date && timeout -sHUP 1m openssl speed
+
+Generate some disk I/O
+
+Run the following command to generate some disk I/O:
+
+date && fallocate -l 1G /home/cloud_user/bigfile && shred -zvu -n 1 /home/cloud_user/bigfile
+
+Make a note of the start and end times from the commands above. We'll need them to know when to look for the increases in resource usages.
+check_circle
+Verify the CPU and disk load in the pcp archive file.
+
+Get the pcp archive file:
+
+pcp | grep logger
+
+Look in the archive log directory and make note of the archive files:
+
+ls -lh /var/log/pcp/pmlogger/ip-10-0-1-10.ec2.internal/
+
+Depending on how long you've taken to do these tasks, the archive log may have rolled over to a new file. The format of the filename is YYYYMMDD.HH.MM. Using your notes of when you ran the CPU and disk I/O commands, determine which file to use.
+
+Display the kernel.all.load values from the selected archive log in 1 minute increments:
+
+    Note: You can use pmval or pmrep here, with these particular metrics, I find pmrep to be easier to read.
+
+pmrep -t 1m -a /var/log/pcp/pmlogger/ip-10-0-1-10.ec2.internal/<FILE>; kernel.all.load
+
+Display the disk.partitions.total_rawactive values from the selected archive log in 1 minute increments:
+
+pmrep -t 1m -a /var/log/pcp/pmlogger/ip-10-0-1-10.ec2.internal/<FILE>; disk.partitions.total_rawactive
+
+##################################################
+
+Youve been asked to configue Server1 to receive logs from Server2. These logs should be placed in /var/log/hosts/HOSTNAME.log.
+
+Note: The tasks under OBJECTIVES have the answers as part of the Tasks. You should try to perform the tasks without looking at the answers where possible.
+Learning Objectives
+check_circle
+Configure Server1 to receive logs.
+
+Server1 will need to be configured to receive logs via TCP.
+
+Uncomment the following section within /etc/rsyslog.conf:
+
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+Then, under the line starting with local7.*, add the following:
+
+$template DynFile,"/var/log/hosts/system-%HOSTNAME%.log"
+*.* -?DynFile
+
+Restart the rsyslog service.
+
+Verify the host is listening on port 514.
+
+Open the firewall to permanently permit incoming traffic on TCP port 514 and reload it.
+check_circle
+Configure Server2 to send logs to Server1.
+
+Verify Server2 can connect to Server1 over TCP port 514.
+
+On Server2, modify the /etc/rsyslog.conf file.
+
+Uncomment the following lines:
+
+$ActionQueueFileName fwdRule1 # unique name prefix for spool files
+$ActionQueueMaxDiskSpace 1g   # 1gb space limit (use as much as possible)
+$ActionQueueSaveOnShutdown on # save messages to disk on shutdown
+$ActionQueueType LinkedList   # run asynchronously
+$ActionResumeRetryCount -1    # infinite retries if host is down
+
+Uncomment the following line and edit as follows:
+
+*.* @@10.0.1.10:514
+
+Restart the rsyslog service.
+check_circle
+Verify logs are being sent to Server1.
+
+Verify the /var/log/hosts directory was created and is being populated.
+
+Use tail on the /var/log/hosts/system-ip-10-0-1-11.log file to see entries from Server2.
+
+You can use the logger command to add entries to the log:
+
+On Server2, enter the following command 3 times:
+
+logger "THIS IS A TEST"
+
+Verify these entries are showing up in the log file on Server1.
+============================================================================
+
+Youve been asked to configue Server1 to receive logs from Server2. These logs should be placed in /var/log/hosts/HOSTNAME.log.
+
+Note: The tasks under OBJECTIVES have the answers as part of the Tasks. You should try to perform the tasks without looking at the answers where possible.
+Learning Objectives
+check_circle
+Configure Server1 to receive logs.
+
+Server1 will need to be configured to receive logs via TCP.
+
+Uncomment the following section within /etc/rsyslog.conf:
+
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+Then, under the line starting with local7.*, add the following:
+
+$template DynFile,"/var/log/hosts/system-%HOSTNAME%.log"
+*.* -?DynFile
+
+Restart the rsyslog service.
+
+Verify the host is listening on port 514.
+
+Open the firewall to permanently permit incoming traffic on TCP port 514 and reload it.
+check_circle
+Configure Server2 to send logs to Server1.
+
+Verify Server2 can connect to Server1 over TCP port 514.
+
+On Server2, modify the /etc/rsyslog.conf file.
+
+Uncomment the following lines:
+
+$ActionQueueFileName fwdRule1 # unique name prefix for spool files
+$ActionQueueMaxDiskSpace 1g   # 1gb space limit (use as much as possible)
+$ActionQueueSaveOnShutdown on # save messages to disk on shutdown
+$ActionQueueType LinkedList   # run asynchronously
+$ActionResumeRetryCount -1    # infinite retries if host is down
+
+Uncomment the following line and edit as follows:
+
+*.* @@10.0.1.10:514
+
+Restart the rsyslog service.
+check_circle
+Verify logs are being sent to Server1.
+
+Verify the /var/log/hosts directory was created and is being populated.
+
+Use tail on the /var/log/hosts/system-ip-10-0-1-11.log file to see entries from Server2.
+
+You can use the logger command to add entries to the log:
+
+On Server2, enter the following command 3 times:
+
+logger "THIS IS A TEST"
+
+Verify these entries are showing up in the log file on Server1.
+==========================================================
+
+Additional Information and Resources
+
+Another administrator has escalated an issue regarding startup of the pmcd service. They are unable to successfully start the service.
+Learning Objectives
+check_circle
+Resolve the startup issue with pmcd.
+
+Attempt to start the pmcd service:
+
+systemctl start pmcd
+
+If the service fails to start, take a look at the details:
+
+systemctl status -l pmcd
+
+Note the "Drop-In" file /etc/systemd/system/pmcd.service.d/dependency.conf.
+
+View the contents of this file and note any directives referencing other services:
+
+cat /etc/systemd/system/pmcd.service.d/dependency.conf
+
+Attempt to start the pmlogger service:
+
+systemctl start pmlogger
+
+If the service won't start, perform the same exercise as above with pmcd.
+
+Resolve the cyclical dependency by modifying the pmcd drop-in file from After=pmlogger.service to Before=pmlogger.service.
+
+Start the pmcd service.
+check_circle
+Configure pmcd to start by default.
+
+Enable pmcd to startup upon reboot:
+
+systemctl enable pmcd
+#################################
+You have been asked to enable connection tracking timeflow stamping in the Linux kernel of a particular host. This change should take effect immediately, as well as persist upon reboot.
+
+The kernel module to change is nf_conntrack, you need to modify the parameter that enables time stamping.
+Learning Objectives
+check_circle
+Enable nf_conntrack time stamping in the running kernel.
+
+Check to see if the module is loaded:
+
+lsmod | grep nf_conntrack
+
+View the parameters available for the nf_conntrack module:
+
+modinfo nf_conntrack
+
+Verify the current setting of the timestamp parameter:
+
+cat /sys/module/nf_conntrack/parameters/tstamp
+
+Stop the firewall and unload the module:
+
+systemctl stop firewalld
+
+modprobe -r nf_conntrack
+
+Load the module with timestamping enabled:
+
+modprobe nf_conntrack tstamp=1
+
+Verify the current setting of the timestamp parameter:
+
+cat /sys/module/nf_conntrack/parameters/tstamp
+
+check_circle
+Make the change persist through a restart.
+
+Make the change persist through a reboot:
+
+echo "options nf_conntrack tstamp=1" > /etc/modprobe.d/nf_conntrack.conf
+
+#############################
+Resolve the first mount in /etc/fstab.
+
+Attempt to mount the first mount listed in /etc/fstab:
+
+mount /storage1
+
+Note that it is an XFS filesystem, and repair it:
+
+xfs_repair /dev/xvdb1
+
+Attempt to mount the filesystem again:
+
+mount /storage1
+
+Verify the files within /storage1 are available:
+
+ll /storage1
+
+check_circle
+Resolve the second mount in /etc/fstab.
+
+Attempt to mount the first mount listed in /etc/fstab:
+
+mount /storage2
+
+Note that it is an ext4 filesystem, and repair it:
+
+e2fsck -p /dev/xvdb2
+
+Attempt to mount the filesystem again:
+
+mount /storage2
+
+Verify the files within /storage1 are available:
+
+ll /storage2
+
+#############
+Additional Information and Resources
+
+A junior administrator has asked for your assistance in troubleshooting a couple of mounts in fstab. They are unable to mount the drives, but insist the mounts have worked in the past.
+Learning Objectives
+check_circle
+Resolve the first mount in /etc/fstab.
+
+Attempt to mount the first mount listed in /etc/fstab:
+
+mount /storage1
+
+Note that it is an XFS filesystem, and repair it:
+
+xfs_repair /dev/xvdb1
+
+Attempt to mount the filesystem again:
+
+mount /storage1
+
+Verify the files within /storage1 are available:
+
+ll /storage1
+
+check_circle
+Resolve the second mount in /etc/fstab.
+
+Attempt to mount the first mount listed in /etc/fstab:
+
+mount /storage2
+
+Note that it is an ext4 filesystem, and repair it:
+
+e2fsck /dev/xvdb2
+
+Attempt to mount the filesystem again:
+
+mount /storage2
+
+Verify the files within /storage1 are available:
+
+ll /storage2
+
+###############################################3
+
+Resolve LVM configuration.
+
+Check the mounts with lsbkl:
+
+lsblk
+
+Attempt to mount the volume:
+
+mount /lvm_mount
+
+View the archive metadata:
+
+vgcfgrestore -l <VOLGROUP NAME>;
+
+Review the changes:
+
+    "Created before executing 'lvresize -L500M /dev/vg_1/lv_1'"
+
+Restore prior to latest change:
+
+vgcfgrestore -f /etc/lvm/archive/vg_1_00002-84057####.vg vg_1
+
+Deactivate and reactive the volume:
+
+lvchange -an /dev/<VOLGROUP>;/<LOG>;
+
+lvchange -ay /dev/<VOLGROUP>;/<LOG>;
+
+check_circle
+Verify LVM volume contents.
+
+The MD5s of each file in the volume are available in the /home/cloud_user/lvm_md5s.txt file. Validate that the md5sums haven't changed for the files in the /lvm_mount directory.
+
+cat /home/cloud_user/lvm_md5s.txt
+
+for i in $(ls /lvm_mount/); do md5sum /lvm_mount/$i; done
+
+============================
+
+Unlock the encrypted device.
+
+Review the contents of /etc/crypttab:
+
+cat /etc/crypttab
+
+Check the mounts with lsbkl :
+
+lsblk
+
+Review the contents of /etc/fstab:
+
+cat /etc/fstab
+
+Attempt to mount /luks:
+
+mount /luks
+
+Look for the unlocked device in /dev/mapper:
+
+ll /dev/mapper
+
+Attempt to open manually:
+
+cryptsetup luksOpen /dev/mapper/vg_1-lv_1 luks-vg_1-lv_1 --key-file /root/passphrase.key
+
+View the key slots:
+
+cryptsetup luksDump /dev/mapper/vg_1-lv_1
+
+No key slots are in use. Locate the header backup in /root/:
+
+ll /root/
+
+Restore header file:
+
+cryptsetup luksHeaderRestore /dev/mapper/vg_1-lv_1 --header-backup-file /root/vg_1-lv_1.header
+
+Type uppercase YES.
+
+Attempt to open manually again (using same key and name as /etc/crypttab:
+
+cryptsetup luksOpen /dev/mapper/vg_1-lv_1 luks-vg_1-lv_1 --key-file /root/passphrase.key
+
+Verify unlocked device:
+
+ll /dev/mapper
+
+check_circle
+Mount the encrypted device.
+
+Mount the unlocked device:
+
+mount /luks/
+
+View the files on the device:
+
+ll /luks/
+#########################
+Review target configuration.
+
+Verify the target service is running:
+
+systemctl status target
+
+Start and enable the target service:
+
+systemctl start target && systemctl enable target
+
+Review the iSCSI target configuration:
+
+targetcli
+
+/> ls
+
+/> iscsi/iqn.2003-01.org.linux-iscsi.ip-10-0-1-10.x8664:sn.a3776832068c/tpg1/ get auth
+
+check_circle
+Review initiator configuration.
+
+View existing block devices:
+
+lsblk
+
+Verify network connectivity to the target:
+
+telnet 10.0.1.10 3260
+
+Review the initiator configuration file:
+
+vim /etc/iscsi/iscsid.conf
+
+Comment out the authentication settings:
+
+#node.session.auth.authmethod = CHAP
+...
+#node.session.auth.username = server2
+#node.session.auth.password = secret
+
+Check for existing target records:
+
+iscsiadm -m node
+
+Verify the name in /etc/iscsi/initatorname.iscsi matches the target ACL:
+
+cat /etc/iscsi/initiatorname.iscsi
+
+Retrieve the target from Server1:
+
+iscsiadm -m discovery -t sendtargets -p 10.0.1.10
+
+Connect to the target:
+
+iscsiadm -m node -T iqn.2003-01.org.linux-iscsi.ip-10-0-1-10.x8664:sn.a3776832068c -l
+
+Verify the block device is available:
+####################
+Verify Server1 is running Apache:
+
+systemctl status httpd
+
+Verify Apache is listening on port 80:
+
+ss -lntp | grep 80
+
+Verify the content can be accessed locally:
+
+curl localhost
+
+Verify the firewall is permitting port 80 traffic:
+
+firewall-cmd --list-all
+
+Permit inbound traffic to Apache:
+
+firewall-cmd --permanent --add-service=http
+
+Reload the firewall to pickup the change:
+
+firewall-cmd --reload
+
+check_circle
+Verify Server2.
+
+On Server2 (10.0.1.11)
+
+Attempt to pull the web content from Server1 via hostname:
+
+curl ip-10-0-1-10.ec2.internal
+
+Attempt to pull the web content from Server1 via IP
+
+curl 10.0.1.10
+
+Check to see what DNS hosts are being used:
+
+cat /etc/resolv.conf
+
+Verify resolution via the specified host:
+
+dig @10.0.0.2 ip-10-0-1-10.ec2.internal
+
+Verify /etc/nsswitch.conf:
+
+vim /etc/nsswitch.conf
+
+Attempt to pull the web content from Server1 via hostname:
+
+curl ip-10-0-1-10.ec2.internal
+
+Ping ip-10-0-1-10.ec2.internal:
+
+ping ip-10-0-1-10.ec2.internal
+
+Review /etc/hosts:
+
+vim /etc/hosts
+
+Attempt to pull the web content from Server1 via hostname:
+
+curl ip-10-0-1-10.ec2.internal
+
+Install elinks:
+
+yum install -y elinks
+
+Use elinks to view the content:
+
+links -dump http://ip-10-0-1-10.ec2.internal
+
+====================
+
+    Troubleshoot and resolve issues using the dig, host, and nslookup commands.
+    Assess the application /root/test_app for a memory leak.
+    Assess and resolve the issue with /root/example_app.
+
+Learning Objectives
+check_circle
+Troubleshoot and resolve issues using the `dig`, `host`, and `nslookup` commands.
+
+Attempt to use dig to look up an IP for linuxacademy.com:
+
+dig linuxacademy.com
+
+Use ldd to view the libraries used by dig:
+
+ldd $(which dig)
+
+libdns.so.1102 is missing. Use yum to find a package that installs this library:
+
+yum provides */libdns.so.1102
+
+Reinstall the bind-libs-lite package:
+
+yum reinstall -y bind-libs-lite
+
+Attempt to use dig to look up an IP for linuxacademy.com:
+
+dig linuxacademy.com
+
+check_circle
+Assess the application /root/memleak_test_app for a memory leak.
+
+Install valgrind:
+
+yum install -y valgrind
+
+Run valgrind against /root/test_app:
+
+valgrind ./memleak_test_app
+
+If the app has a memory leak, remove executable permissions:
+
+chmod -x /root/memleak_test_app
+
+check_circle
+Assess and resolve the issue with /root/example_app.
+
+Attempt to run the application:
+
+/root/example_app
+
+Install strace:
+
+yum install -y strace
+
+Run the application again using strace:
+
+strace /root/example_app
+
+Create the missing file:
+
+touch /etc/example.conf
+
+Run the application again:
+
+/root/example_app
+lsblk
+
+####################################
+
+Verify the Samba service.
+
+check_circle
+Resolve authentication issue.
+
+Check /var/log/secure for any errors:
+
+tail /var/log/secure
+
+Check the Samba logs for any errors:
+
+tail /var/log/samba/log.smbd
+
+View the PAM service file:
+
+cat /etc/pam.d/samba
+
+Verify the package to see if any PAM files are changed:
+
+rpm -V samba
+
+Move the changes PAM file to /root/samba.pam.old:
+
+mv /etc/pam.d/samba /root/samba.pam.old
+
+Reinstall Samba to restore the original PAM file:
+
+yum reinstall -y samba
+
+Restart the Samba service:
+
+systemctl restart smb
+
+View the listing of shares on the localhost:
+
+smbclient -U cloud_user -L localhost
+
+##############################
+
+Verify LDAP and Kerberos logins on Server1.
+
+check_circle
+Verify LDAP and Kerberos logins on Server2.
+
+On Server2 (10.0.1.11)
+
+Attempt to SSH in as testuser01:
+
+ssh testuser01@localhost
+
+Use getent to retrieve account information about testuser01:
+
+getent passwd testuser01
+
+Verify LDAP and Kerberos logins are enabled:
+
+cat /etc/sysconfig/authconfig
+
+User authconfig-tui to modify LDAP settings:
+
+authconfig-tui
+
+Use getent to retrieve account information about testuser01:
+
+getent passwd testuser01
+
+SSH in as testuser01 and receive a Kerberos ticket:
+
+ssh testuser01@localhost
+
+kinit
+
+klist
+
+################################################################
+
+Learning Objectives
+check_circle
+Troubleshoot and resolve Server1.
+
+Resolve login issues for testuser01
+
+Try to log in as testuser01:
+
+ssh testuser01@localhost
+
+View /var/log/secure:
+
+tail /var/log/secure
+
+Attempt to pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+View and modify /etc/openldap/ldap.conf:
+
+vim /etc/openldap/ldap.conf
+
+Change:
+
+URI ldap://ldap.example.com/
+
+To:
+
+URI ldap://auth.example.com/
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+Restart the LDAP naming services daemon:
+
+systemctl restart nslcd
+
+Attempt to pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+View /etc/sysconfig/authconfig:
+
+cat /etc/sysconfig/authconfig
+
+Modify authconfig using the TUI interface:
+
+authconfig-tui
+
+Within authconfig-tui:
+
+    Verify Use LDAP is checked under User Information
+    Check Use Kerberos under Authentication
+    Modify the LDAP server to use auth.example.com
+    Use auth.example.com for the KDC and Admin Server for Kerberos
+
+Restart the LDAP naming services daemon:
+
+systemctl restart nslcd
+
+Pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+Log in to the localhost as testuser01:
+
+ssh testuser01@localhost
+
+Obtain a Kerberos ticket
+
+kinit
+
+List cached Kerberos tickets and logout:
+
+klist && exit
+
+Resolve Samba issues for cloud_user
+
+Verify Samba is started and enabled:
+
+systemctl start smb && systemctl enable smb
+
+Attempt to list the shares using cloud_user:
+
+smbclient -U cloud_user -L localhost
+
+View the Samba log:
+
+tail /var/log/samba/log.smbd
+
+View the Samba PAM config:
+
+cat /etc/pam.d/samba
+
+Verify the Samba package:
+
+rpm -V samba
+
+Move the modified file to /root/samba.pam.old:
+
+mv /etc/pam.d/samba /root/samba.pam.old
+
+Reinstall Samba:
+
+yum reinstall -y samba
+
+List the shares using cloud_user:
+
+smbclient -U cloud_user -L localhost
+
+check_circle
+Troubleshoot and resolve Server2.
+
+Use authconfig-tui to verify and modify LDAP/Kerberos authentication:
+
+authconfig-tui
+
+    Verify Use LDAP is checked for both User Information and Authentication
+    Verify Use Kerberos is checked for Authentication
+    LDAP server should be auth.example.com
+    Kerberos KDC and Admin should be auth.example.com
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+Ping the LDAP server:
+
+ping auth.example.com
+
+Note the IP, view the contents of /etc/hosts:
+
+cat /etc/hosts
+
+Modify /etc/hosts so that auth.example.com points to 10.0.1.5:
+
+vim /etc/hosts
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+Restart the LDAP naming services daemon:
+
+systemctl restart nslcd
+
+Pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+Log in as testuser01:
+
+ssh testuser01@localhost
+
+Obtain a Kerberos ticket:
+
+kinit
+
+List Kerberos ticket cache:
+
+klist
+
+
+Learning Objectives
+check_circle
+Troubleshoot and resolve Server1.
+
+Resolve login issues for testuser01
+
+Try to log in as testuser01:
+
+ssh testuser01@localhost
+
+View /var/log/secure:
+
+tail /var/log/secure
+
+Attempt to pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+View and modify /etc/openldap/ldap.conf:
+
+vim /etc/openldap/ldap.conf
+
+Change:
+
+URI ldap://ldap.example.com/
+
+To:
+
+URI ldap://auth.example.com/
+
+Perform an LDAP search:
+
+ldapsearch -x *
+
+Restart the LDAP naming services daemon:
+
+systemctl restart nslcd
+
+Attempt to pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+View /etc/sysconfig/authconfig:
+
+cat /etc/sysconfig/authconfig
+
+Modify authconfig using the TUI interface:
+
+authconfig-tui
+
+Within authconfig-tui:
+
+    Verify Use LDAP is checked under User Information
+    Check Use Kerberos under Authentication
+    Modify the LDAP server to use auth.example.com
+    Use auth.example.com for the KDC and Admin Server for Kerberos
+
+Restart the LDAP naming services daemon:
+
+systemctl restart nslcd
+
+Pull the LDAP user information for testuser01:
+
+getent passwd testuser01
+
+Log in to the localhost as testuser01:
+
+ssh testuser01@localhost
+
+Obtain a Kerberos ticket
+
+kinit
+
+List cached Kerberos tickets and logout:
+
+klist && exit
+
+Resolve Samba issues for cloud_user
+
+Verify Samba is started and enabled:
+
+systemctl start smb && systemctl enable smb
+
+Attempt to list the shares using cloud_user:
+
+smbclient -U cloud_user -L localhost
+
+View the Samba log:
+
+tail /var/log/samba/log.smbd
+
+View the Samba PAM config:
+
+cat /etc/pam.d/samba
+
+Verify the Samba package:
+
+rpm -V samba
+
+Move the modified file to /root/samba.pam.old:
+
+mv /etc/pam.d/samba /root/samba.pam.old
+
+Reinstall Samba:
+
+yum reinstall -y samba
+
+List the shares using cloud_user:
+
+smbclient -U cloud_user -L localhost
+
+######################################
+
+Enable kernel dumps.
+
+Note: The hypervisor used by EC2 prevents kdump from being engaged. Forcing a kernel crash will simply prevent you from logging back in for 3-4 miniutes. No crash will be present in /var/crash.
+
+Start and enable the kdump service:
+
+systemctl start kdump && systemctl enable kdump
+
+You'll notice kdump doesn't start. Install necessary packages:
+
+yum --enablerepo=rhel-7-server-rhui-debug-rpms install -y kexec-tools crash kernel-debug kernel-debuginfo-$(uname -r)
+
+Modify /etc/default/grub to set crash memory to 128M.
+
+Install the new Grub config:
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+check_circle
+Permit cloud_user to run the example.stp via SystemTap.
+
+Install SystemTap:
+
+yum install -y systemtap kernel-devel-$(uname -r)
+
+Run the example script: /root/example.stp
+
+stap /root/example.stp
+
+Compile the script as a module:
+
+stap -p 4 -v -m stap_example example.stp
+
+Create a systemtap directory for the module:
+
+mkdir /lib/modules/$(uname -r)/systemtap
+
+Move the module into the new directory:
+
+mv stap_example.ko /lib/modules/`uname -r`/systemtap/
+
+Run the module:
+
+staprun stap_example
+
+Add cloud_user to the stapusr group:
+
+usermod -aG stapusr cloud_user
+
+Verify cloud_user can run the module:
+
+runuser -l cloud_user -c 'staprun stap_example'
+
+#################
+Configure the system to perform a kernel dump upon a crash, using no more than 128 MB for the crash kernel.
+
+Permit cloud_user to run /root/example.stp as a module stap_example.
+Learning Objectives
+check_circle
+Enable kernel dumps.
+
+Note: The hypervisor used by EC2 prevents kdump from being engaged. Forcing a kernel crash will simply prevent you from logging back in for 3-4 miniutes. No crash will be present in /var/crash.
+
+Start and enable the kdump service:
+
+systemctl start kdump && systemctl enable kdump
+
+You'll notice kdump doesn't start. Install necessary packages:
+
+yum --enablerepo=rhel-7-server-rhui-debug-rpms install -y kexec-tools crash kernel-debug kernel-debuginfo-$(uname -r)
+
+Modify /etc/default/grub to set crash memory to 128M.
+
+Install the new Grub config:
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+check_circle
+Permit cloud_user to run the example.stp via SystemTap.
+
+Install SystemTap:
+
+yum install -y systemtap kernel-devel-$(uname -r)
+
+Run the example script: /root/example.stp
+
+stap /root/example.stp
+
+Compile the script as a module:
+
+stap -p 4 -v -m stap_example example.stp
+
+Create a systemtap directory for the module:
+
+mkdir /lib/modules/$(uname -r)/systemtap
+
+Move the module into the new directory:
+
+mv stap_example.ko /lib/modules/`uname -r`/systemtap/
+
+Run the module:
+
+staprun stap_example
+
+Add cloud_user to the stapusr group:
+
+usermod -aG stapusr cloud_user
+
+Verify cloud_user can run the module:
+
+runuser -l cloud_user -c 'staprun stap_example'
