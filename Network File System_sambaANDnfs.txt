@@ -1,0 +1,158 @@
+command to use to make the nfs server on Red Hat
+
+	1  yum update -y
+    2  yum upgrade
+    3  yum update
+    4  cd /
+    5  ls
+    6  yum install cifs-utils -y
+    7  df -h
+    8  mount -t cifs //10.0.1.100/share /mnst/smb -o username=shareuser,password=Rise@1234
+    9  mount -t cifs //10.0.1.100/share /mnt/smb -o username=shareuser,password=Rise@1234
+   10  clear
+   11  yum install nfs-utils -y
+   12  mkdir /nfs
+   13  vim /etc/exports
+   14  chmod 777 /nfs
+   16  exportfs -a
+   17  systemctl start {rpcbind,nfs-server,rpc-statd,nfs-idmapd}
+   18  ip -ad
+   19  ip -add
+   20  ip -address
+   21  ifconfing
+   22  ifconfig
+   23  df -h
+   24  ls
+   
+
+on nfs client
+
+   14 yum install nfs-utils -y
+   15  mkdir /mnt/nfs
+   16  showmount -e 10.0.1.101
+   17  systemctl start rpcbind
+   18  mount -t nfs 10.0.1.101:nfs /mnt/nfs
+   
+   
+===============================================================================================================================================  
+Step to install SMB Server 
+
+    5  yum install samba -y
+    6  vim /etc/samba/smb.conf
+    7  useradd shareuser
+    8  smbpasswd -a shareuser
+    9  mkdir /smb
+   10  systemctl start smb
+   11  chmod 777 /smb
+  
+   
+On client SMB   
+		1  mkdir /mnt/smb
+   		2 yum install cifs-utils -y
+		3  df -h
+        4  mount -t cifs //10.0.1.100/share /mnst/smb -o username=shareuser,password=Rise@1234
+       
+
+ 
+
+====================================================================================================================================
+
+We need to set two servers up so that they can share files over both NFS and SMB.
+
+The shares need to be writable on both ends, and we can't use no_root_squash on the NFS server.
+Learning Objectives
+check_circle
+Set Up a Samba Share
+
+    Install the Samba packages:
+
+    yum install samba -y
+
+    Edit /etc/samba/smb.conf and add the following section at the bottom:
+
+    [share]
+            browsable = yes
+            path = /smb
+            writable = yes
+
+    Save and exit.
+
+    Create a user to share the mount point:
+
+    useradd shareuser
+
+    smbpasswd -a shareuser
+
+    Create the directory we're sharing out:
+
+    mkdir /smb
+
+    Start the smb service:
+
+    systemctl start smb
+
+    Make sure the client can write to the directory:
+
+    chmod 777 /smb
+
+    On the client, run:
+
+    mkdir /mnt/smb
+
+    On the client, install the CIFS utilities:
+
+    yum install cifs-utils -y
+
+    On the client, run:
+
+    mount -t cifs //<IP_OF_SERVER>/share /mnt/smb -o username=shareuser,password=<PASSWORD_SET_WITH_SMBPASSWD>
+
+check_circle
+Set Up the NFS Share
+
+    Install the required package:
+
+    yum install nfs-utils -y
+
+    Create the mount point that will be served out:
+
+    mkdir /nfs
+
+    Edit /etc/exports, adding the following line:
+
+    /nfs *(rw)
+
+    Save and exit the file.
+
+    Make sure it's writable:
+
+    chmod 777 /nfs
+
+    Export the directory we've configured in /etc/exports:
+
+    exportfs -a
+
+    Start the required services:
+
+    systemctl start {rpcbind,nfs-server,rpc-statd,nfs-idmapd}
+
+    On the client, install the required package:
+
+    yum install nfs-utils -y
+
+    Create the mount point:
+
+    mkdir /mnt/nfs
+
+    Check to see what's being shared out on the NFS server:
+
+    showmount -e <NFS_SERVER_IP>
+
+    Start the required service:
+
+    systemctl start rpcbind
+
+    Mount it:
+
+    mount -t nfs <NFS_SERVER_IP>:/nfs /mnt/nfs
+
