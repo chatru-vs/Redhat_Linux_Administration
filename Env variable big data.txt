@@ -1,0 +1,92 @@
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+#hive related options
+export HIVE_HOME=/home/chpr/apache-hive-3.1.2-bin  
+export PATH=$PATH:/home/chpr/apache-hive-3.1.2-bin/bin 
+
+#Impala configration
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
+export LC_ALL="en_US.UTF-8"
+export M2_HOME=/usr/share/maven
+export M2=$M2_HOME/bin
+export PATH=$M2:$PATH
+
+export IMPALA_HOME=/etc/Impala/
+export BOOST_LIBRARYDIR=/usr/lib/x86_64-linux-gnu
+
+#Hbase related options
+export HBASE_HOME=/home/chpr/hbase
+export PATH=$PATH:$HBASE_HOME/bin
+#Hadoop Related Options
+# -- HADOOP ENVIRONMENT VARIABLES START -- #
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+export HADOOP_HOME=/usr/local/hdoop/hadoop-3.2.1
+export PATH=$PATH:$HADOOP_HOME/bin
+export PATH=$PATH:$HADOOP_HOME/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+#hive options
+export HIVE_HOME=/home/chpr/apache-hive-3.1.2-bin
+export PATH=$PATH:$HIVE_HOME/bin
+#sqoop options
+export SQOOP_HOME=/home/chpr/sqoop-1.4.7
+export PATH=$PATH:$SQOOP_HOME/bin
+#spark Home
+export SPARK_HOME=/home/chpr/spark-3
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+export PYSPARK_PYTHON=/usr/bin/python3
+#flume Home
+export FLUME_HOME=/home/chpr/apache-flume-1.9.0
+export PATH=$PATH:$FLUME_HOME/bin
+#Pig Home
+export PIG_HOME=/home/chpr/pig-0.17.0
+export PATH=$PATH:/home/chpr/pig-0.17.0/bin
+export PIG_CLASSPATH=$HADOOP_HOME/conf
+#maven option
+export M2_HOME=/home/chpr/apache-maven-3.8.4
+export PATH=$PATH:/home/chpr/apache-maven-3.8.4/bin
+export OOZIE_HOME=/usr/local/oozie/oozie-5.2.1
+
+
+IMPALA_HOME             = /etc/Impala
+HADOOP_HOME             = /etc/Impala/toolchain/cdp_components-18462549/hadoop-3.1.1.7.2.14.0-21/
+HADOOP_CONF_DIR         = /etc/Impala/fe/src/test/resources
+HADOOP_INCLUDE_DIR      = /etc/Impala/toolchain/cdp_components-18462549/hadoop-3.1.1.7.2.14.0-21//include
+HADOOP_LIB_DIR          = /etc/Impala/toolchain/cdp_components-18462549/hadoop-3.1.1.7.2.14.0-21//lib
+IMPALA_CLUSTER_NODES_DIR= /etc/Impala/testdata/cluster/cdh7
+HIVE_HOME               = /etc/Impala/toolchain/cdp_components-18462549/apache-hive-3.1.3000.7.2.14.0-21-bin
+HIVE_CONF_DIR           = /etc/Impala/fe/./src/test/resources
+HIVE_SRC_DIR            = /etc/Impala/toolchain/cdp_components-18462549/hive-3.1.3000.7.2.14.0-21
+HBASE_HOME              = /etc/Impala/toolchain/cdp_components-18462549/hbase-2.2.6.7.2.14.0-21/
+HBASE_CONF_DIR          = /etc/Impala/fe/src/test/resources
+RANGER_HOME             = /etc/Impala/toolchain/cdp_components-18462549/ranger-2.1.0.7.2.14.0-21-admin
+RANGER_CONF_DIR         = /etc/Impala/fe/src/test/resources 
+THRIFT_HOME             = /etc/Impala/toolchain/toolchain-packages-gcc7.5.0/thrift-0.11.0-p4
+CLASSPATH               = /etc/Impala/fe/src/test/resources:/etc/Impala/fe/target/classes:/etc/Impala/fe/target/dependency:
+LIBHDFS_OPTS            =  -Djava.library.path=/etc/Impala/toolchain/cdp_components-18462549/hadoop-3.1.1.7.2.14.0-21//lib/native/ -XX:ErrorFile=/etc/Impala/logs/hs_err_pid%p.log -XX:MaxPermSize=128m
+JAVA_HOME               = /usr/lib/jvm/java-8-openjdk-amd64
+POSTGRES_JDBC_DRIVER    = /etc/Impala/fe/target/dependency/postgresql-42.2.14.jar
+IMPALA_TOOLCHAIN        = /etc/Impala/toolchain
+IMPALA_TOOLCHAIN_PACKAGES_HOME = /etc/Impala/toolchain/toolchain-packages-gcc7.5.0
+METASTORE_DB            = HMS_etc_Impala_cdp
+DOWNLOAD_CDH_COMPONENTS = true
+IMPALA_MAVEN_OPTIONS    = 
+IMPALA_TOOLCHAIN_HOST   = native-toolchain.s3.amazonaws.com
+CDP_BUILD_NUMBER        = 18462549
+CDP_COMPONENTS_HOME     = /etc/Impala/toolchain/cdp_components-18462549
+IMPALA_HADOOP_VERSION   = 3.1.1.7.2.14.0-21
+IMPALA_AVRO_JAVA_VERSION= 1.8.2.7.2.14.0-21
+IMPALA_PARQUET_VERSION  = 1.10.99.7.2.14.0-21
+IMPALA_HIVE_VERSION     = 3.1.3000.7.2.14.0-21
+IMPALA_HBASE_VERSION    = 2.2.6.7.2.14.0-21
+IMPALA_HUDI_VERSION     = 0.5.0-incubating
+IMPALA_KUDU_VERSION     = f486f0813a
+IMPALA_RANGER_VERSION   = 2.1.0.7.2.14.0-21
+IMPALA_ICEBERG_VERSION  = 0.9.1.7.2.14.0-21
+IMPALA_GCS_VERSION      = 2.1.2.7.2.14.0-21
+IMPALA_COS_VERSION      = 3.1.0-5.9.3

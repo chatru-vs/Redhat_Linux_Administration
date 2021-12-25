@@ -1,0 +1,11 @@
+cd ~
+vim .bashrc
+export GROOT=/usr/local/go
+export PATH=$PATH:$GROOT/bin
+:wq
+source ~/.bashrc
+go version
+
+export GOPATH=/home/chpr/golib
+export PATH=$PATH:$GOPATH/BIN
+source ~bashrc

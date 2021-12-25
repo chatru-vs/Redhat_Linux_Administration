@@ -1,0 +1,22 @@
+node --version
+npm --version
+npm init  => it will create the package json file
+npm install express --save - insatll express package
+npm unistall express - uninstall the express
+npm i -g nodemon => nodemon  install globally 
+npm i @angular/cli
+const harry = require("./second"); =>manully create module
+
+harry = {
+name: "Harry"
+favNum: 3
+developer: true
+}
+
+const os = require('os') => inbuild dependency
+
+const fs = require('fs');
+const a = fs.readFileSync('file.txt')
+consolce.log(a.toString())
+console.log("finished reading file")
+

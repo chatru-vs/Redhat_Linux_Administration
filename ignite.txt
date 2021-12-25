@@ -1,0 +1,46 @@
+copy control center agent from C:\Users\chatru\Downloads\gridgain-community-8.8.11\libs\optional\control-center-agent to C:\Users\chatru\Downloads\gridgain-community-8.8.11\libs\control-center-agent
+
+first run the control-center.bat => to run the web console
+
+ignite.bat = run the ignite server database 
+
+ignitevisor.cmd
+open 
+click yes
+Some useful commands:
++--------------------------------------------+
+| Type 'top'    | to see full topology.      |
+| Type 'node'   | to see node statistics.    |
+| Type 'cache'  | to see cache statistics.   |
+| Type 'tasks'  | to see tasks statistics.   |
+| Type 'config' | to see node configuration. |
++-------------------------------------------
+
+[12:09:14] Performance suggestions for grid  (fix if possible)
+[12:09:14] To disable, set -DIGNITE_PERFORMANCE_SUGGESTIONS_DISABLED=true
+[12:09:14]   ^-- Switch to the most recent 11 JVM version
+[12:09:14]   ^-- Enable G1 Garbage Collector (add '-XX:+UseG1GC' to JVM options)
+[12:09:14]   ^-- Set max direct memory size if getting 'OOME: Direct buffer memory' (add '-XX:MaxDirectMemorySize=<size>[g|G|m|M|k|K]' to JVM options)
+[12:09:14] Refer to this page for more performance suggestions: https://apacheignite.readme.io/docs/jvm-and-system-tuning
+[12:09:14]
+[12:09:14] To start Console Management & Monitoring run ignitevisorcmd.{sh|bat}
+[12:09:14]
+[12:09:14] Ignite node started OK (id=40e44710)
+[12:09:14] Topology snapshot [ver=1, locNode=40e44710, servers=1, clients=0, state=ACTIVE, CPUs=4, offheap=3.2GB, heap=1.0GB]
+[12:09:14]   ^-- Baseline [id=0, size=1, online=1, offline=0]
+[12:09:15] Established websocket connection with Control Center: http://localhost:3000
+[12:09:15]
+
+>>> +---------------------------------------------------------------------------------------------------+
+>>> | Open the link in a browser to monitor your cluster:                                               |
+>>> | http://localhost:3000/go/5bf8bff6-cd16-417a-821c-82a67401c362                                     |
+>>> +---------------------------------------------------------------------------------------------------+
+>>> | If you are already using Control Center, you can add the cluster manually using a one-time token: |
+>>> | 5bf8bff6-cd16-417a-821c-82a67401c362                                                              |
+>>> |                                                                                                   |
+>>> | NOTE: this token will expire in 5 minutes.                                                        |
+>>> | New token can be generated with the following command: management.(sh|bat) --token                |
+>>> +---------------------------------------------------------------------------------------------------+
+>>> | For more information about connection to GridGain Control Center, please visit:                   |
+>>> | https://www.gridgain.com/docs/control-center/latest/connect-gridgain-cluster                      |
+>>> +---------------------------------------------------------------------------------------------------+

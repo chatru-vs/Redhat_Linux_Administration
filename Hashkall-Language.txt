@@ -1,0 +1,14 @@
+C:\Users\chatru\AppData\Local\Programs\stack\x86_64-windows
+
+stack new <testhack>
+cd testhack
+stack build
+stack run
+ :quit
+ :help
+
+'./.bashrc' -> '/home/chatru/.bashrc'
+'./.bash_logout' -> '/home/chatru/.bash_logout'
+'./.bash_profile' -> '/home/chatru/.bash_profile'
+'./.inputrc' -> '/home/chatru/.inputrc'
+'./.profile' -> '/home/chatru/.profile'
